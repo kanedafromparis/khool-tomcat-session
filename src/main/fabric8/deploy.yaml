@@ -1,0 +1,33 @@
+#
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${project.artifactId}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    spec:
+      containers:
+      - imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http-tomcat
+          protocol: TCP
+          targetPort: 8080
+      #### Section for jgroup clustering
+        - containerPort: 50000
+          name: nio-receiver
+          protocol: TCP
+          targetPort: 50000
+        - containerPort: 45564
+          name: m-cast-service
+          protocol: TCP
+          targetPort: 45564
+      terminationGracePeriodSeconds: 5

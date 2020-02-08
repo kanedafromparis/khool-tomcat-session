@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ${project.artifactId}
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  backend:
+    serviceName: ${project.artifactId}
+    servicePort: 8080
+  rules:
+  - host: ${project.artifactId}.${project.name}.info # ATTENTION : project.name has a dash '-'
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ${project.artifactId}
+          servicePort: 8080

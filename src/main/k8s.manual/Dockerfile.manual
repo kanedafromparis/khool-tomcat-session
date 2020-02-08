@@ -1,0 +1,11 @@
+# This is a Dockerfile for pedagogical purpose
+# It can be use to build the docker image manually :
+# mvn package && docker build -f src/main/k8s.manual/Dockerfile.manual . -t khool-session-manual:0.2
+# kubectl apply -f src/main/k8s.manual/
+#
+FROM tomcat:jdk11-openjdk-slim
+RUN cp -r  /usr/local/tomcat/webapps.dist/examples/ /usr/local/tomcat/webapps/examples
+ADD src/main/conf/conf-tomcat-server.xml /usr/local/tomcat/conf/server.xml
+ADD src/main/conf/conf-context.xml /usr/local/tomcat/conf/context.xml
+
+ADD target/khoolsession-0.2-SNAPSHOT.war /usr/local/tomcat/webapps/khoolsession.war

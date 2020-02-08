@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.kandefromparis</groupId>
+    <artifactId>khoolsession</artifactId>
+    <version>0.2-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <name>khool-session</name>
+
+    <properties>
+        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <fabric8.build.strategy>docker</fabric8.build.strategy>
+        <fabric8.build.switchToDeployment>true</fabric8.build.switchToDeployment>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>7.0</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <compilerArguments>
+                        <endorseddirs>${endorsed.dir}</endorseddirs>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${endorsed.dir}</outputDirectory>
+                            <silent>true</silent>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax</groupId>
+                                    <artifactId>javaee-endorsed-api</artifactId>
+                                    <version>7.0</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>fabric8-maven-plugin</artifactId>
+                <version>4.3.1</version>
+                <configuration>
+                    <isJib>false</isJib>
+                    <generateRoute>false</generateRoute>
+                    <images>
+                        <image>
+                            <name>${project.artifactId}:${project.version}</name>
+                            <alias>dockerfile</alias>
+                            <build>
+                                <filter>${*}</filter>
+                                <contextDir>${project.basedir}/src/main/docker</contextDir>
+                                <assembly>
+                                    <mode>dir</mode>
+                                    <targetDir>/</targetDir>
+                                    <descriptor>docker-assembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                            <run>
+                                <ports>
+                                    <port>8080:8080</port>
+                                    <port>4000:4000</port>
+                                    <port>45564:45564</port>
+                                </ports>
+                            </run>
+                        </image>
+                    </images>
+                    <namespace>${project.artifactId}</namespace>
+                    <!-- This is the kubernetes ressources configuration -->
+                    <resources>
+                        <labels>
+                            <all>
+                                <io.github.kandefromparis.app.name>${project.artifactId}</io.github.kandefromparis.app.name>
+                                <io.github.kandefromparis.app.version>${project.version}</io.github.kandefromparis.app.version>
+                            </all>
+                        </labels>
+                    </resources>
+                </configuration>
+                <!-- Connect fabric8:resource to the lifecycle phases -->
+                <executions>
+                    <execution>
+                        <id>fabric8</id>
+                        <goals>
+                            <goal>resource</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

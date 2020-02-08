@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    run: khool-session 
+  name: khool-session
+  namespace: khool-session-manual
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  backend:
+    serviceName: khool-session
+    servicePort: 8080
+  rules:
+  - host: khool-session-manual.khool-session.info
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: khool-session
+          servicePort: 8080

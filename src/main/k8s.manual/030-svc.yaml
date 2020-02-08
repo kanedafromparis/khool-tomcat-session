@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: khool-session
+  name: khool-session
+  namespace: khool-session-manual
+spec:
+  ports:
+  - port: 8080
+    name: http-tomcat
+    protocol: TCP
+    targetPort: 8080
+#### Section for jgroup clustering
+  - port: 4000
+    name: nio-receiver
+    protocol: TCP
+    targetPort: 4000
+  - port: 45564
+    name: m-cast-service
+    protocol: TCP
+    targetPort: 45564
+#####
+  selector:
+    run: khool-session
+#  sessionAffinity: ClientIP
+#  sessionAffinityConfig:
+#    clientIP:
+#      timeoutSeconds: 10800
