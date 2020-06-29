@@ -5,7 +5,7 @@
 
     <groupId>io.github.kandefromparis</groupId>
     <artifactId>khoolsession</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>khool-session</name>
