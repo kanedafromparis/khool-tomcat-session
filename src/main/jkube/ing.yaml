@@ -1,6 +1,11 @@
 apiVersion: extensions/v1beta1
+# because of current client
+#apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  labels:
+    app.kubernetes.io/name: ${project.artifactId}
+    app.kubernetes.io/version: "${project.version}"
   name: ${project.artifactId}
   annotations:
     nginx.ingress.kubernetes.io/affinity: "cookie"

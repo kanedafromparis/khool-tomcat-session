@@ -1,0 +1,22 @@
+# This is a Dockerfile for pedagogical purpose
+# It can be use to build the docker image manually :
+# docker build -f src/main/k8s.manual/Dockerfile.withBuilder.manual . -t khool-session-manual:0.3
+# kubectl apply -f src/main/k8s.manual/
+#
+FROM maven:3.6.3-adoptopenjdk-11 as builder
+ARG REVISION=0.3
+COPY pom.xml /tmp/pom.xml
+RUN mvn -B -f /tmp/pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:copy-dependencies dependency:resolve dependency:resolve-plugins dependency:go-offline
+COPY src/main/conf /tmp/src/main/conf
+COPY src/main/webapp /tmp/src/main/webapp
+COPY src/main/java /tmp/src/main/java
+RUN mvn -B -f /tmp/pom.xml -s /usr/share/maven/ref/settings-docker.xml package
+RUN ls -l /tmp/target
+
+
+FROM tomcat:jdk11-openjdk-slim
+ARG REVISION=0.3-SNAPSHOT
+RUN cp -r  /usr/local/tomcat/webapps.dist/examples/ /usr/local/tomcat/webapps/examples
+COPY --from=builder /tmp/src/main/conf/conf-tomcat-server.xml /usr/local/tomcat/conf/server.xml
+COPY --from=builder /tmp/src/main/conf/conf-context.xml /usr/local/tomcat/conf/context.xml
+COPY --from=builder /tmp/target/khoolsession-${REVISION}.war /usr/local/tomcat/webapps/khoolsession.war

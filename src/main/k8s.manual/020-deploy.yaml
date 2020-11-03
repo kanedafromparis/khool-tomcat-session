@@ -29,7 +29,7 @@ spec:
         run: khool-session
     spec:
       containers:
-      - image: khool-session-manual:0.2
+      - image: khool-session-manual:0.3
         imagePullPolicy: IfNotPresent
         name: khool-session
         ports:
@@ -48,6 +48,7 @@ spec:
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst
       restartPolicy: Always
+      serviceAccount: khoolsa
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 5

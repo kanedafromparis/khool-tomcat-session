@@ -51,7 +51,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.1.2</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>
@@ -74,9 +74,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>fabric8-maven-plugin</artifactId>
-                <version>4.3.1</version>
+                <groupId>org.eclipse.jkube</groupId>
+                <artifactId>kubernetes-maven-plugin</artifactId>
+                <version>1.0.2</version>
                 <configuration>
                     <isJib>false</isJib>
                     <generateRoute>false</generateRoute>
@@ -88,9 +88,28 @@
                                 <filter>${*}</filter>
                                 <contextDir>${project.basedir}/src/main/docker</contextDir>
                                 <assembly>
+                                    <name>default</name>
                                     <mode>dir</mode>
                                     <targetDir>/</targetDir>
-                                    <descriptor>docker-assembly.xml</descriptor>
+                                    <inline>
++                                        <id>docker</id>
++                                        <fileSets>
++                                            <fileSet>
++                                                <directory>${project.basedir}/target</directory>
++                                                <includes>
++                                                    <include>${project.artifactId}-${project.version}.war</include>
++                                                </includes>
++                                                <outputDirectory>war/</outputDirectory>
++                                            </fileSet>
++                                            <fileSet>
++                                                <directory>${project.basedir}/src/main/conf/</directory>
++                                                <includes>
++                                                    <include>*.xml</include>
++                                                </includes>
++                                                <outputDirectory>conf</outputDirectory>
++                                            </fileSet>
++                                        </fileSets>
++                                    </inline>
                                 </assembly>
                             </build>
                             <run>
@@ -116,7 +135,7 @@
                 <!-- Connect fabric8:resource to the lifecycle phases -->
                 <executions>
                     <execution>
-                        <id>fabric8</id>
+                        <id>k8s</id>
                         <goals>
                             <goal>resource</goal>
                         </goals>

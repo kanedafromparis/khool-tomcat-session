@@ -22,7 +22,7 @@ and copy the result in `/etc/hosts`
 ```bash
 kubectl get ns                               #to check kubernetes si set correctly
 eval $(minikube docker-env -p khool-session) # to use minikube docker registry
-mvn package fabric8:build fabric8:deploy    # to builds and deploy 3 instance (it take around 5 minutes also)
+mvn package k8s:build k8s:deploy    # to builds and deploy 3 instance (it take around 5 minutes also)
 ```
 
 You should be able to acces the demo page <http://khoolsession.khool-session.info/khoolsession/BasicServlet>
@@ -36,43 +36,43 @@ that dispaly :
 If you call the endpoint several time without keeping cookie, you'll have a new Session ID each time. (we use grep to keep only informations we need)
 
 ```bash
-$ version=khoolsession; for i in {1..5} ; do curl -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep "Session ID:"; done
+version=khoolsession; for i in {1..5} ; do curl -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep "Session ID:"; done
 
-Session ID: 9238BFD68F9C5F6FE2222FD12F2ED256<br />
-Session ID: 90928813B6DDFB05CF652D3BAD9265A1<br />
-Session ID: 2DC154CEEA05D09048A71B86255A308F<br />
-Session ID: 6BBD6C1F029E2D0FDB3281A197BE94A4<br />
-Session ID: 873511BB13598B340CD5237E7C08DD47<br />
+# Session ID: 9238BFD68F9C5F6FE2222FD12F2ED256<br />
+# Session ID: 90928813B6DDFB05CF652D3BAD9265A1<br />
+# Session ID: 2DC154CEEA05D09048A71B86255A308F<br />
+# Session ID: 6BBD6C1F029E2D0FDB3281A197BE94A4<br />
+# Session ID: 873511BB13598B340CD5237E7C08DD47<br />
 
 ```
 
 If we keep cookie (`-b /tmp/cookies -c /tmp/cookies`) we can see that we keep the same session id.
 
 ```bash
-$ version=khoolsession; for i in {1..5} ; do curl -b /tmp/cookies -c /tmp/cookies -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep "Session ID:"; done
+version=khoolsession; for i in {1..5} ; do curl -b /tmp/cookies -c /tmp/cookies -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep "Session ID:"; done
 
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
 
 ```
 
-And we widen the grep scop with a `-A 1` to add on line after our grep match.
+And we widen the grep scope with a `-A 1` to add on line after our grep match, in order to check pod's name.
 
 ```bash
-$ version=khoolsession; for i in {1..5} ; do curl -b /tmp/cookies -c /tmp/cookies -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep -A1 "Session ID:"; done
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
+version=khoolsession; for i in {1..5} ; do curl -b /tmp/cookies -c /tmp/cookies -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep -A1 "Session ID:"; done
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-wpb8m</b><br />
 ```
 
 We can see that we are always on the same pod. Sticky session works !
@@ -86,17 +86,17 @@ version=khoolsession; kubectl -n khoolsession delete po  $(curl -b /tmp/cookies 
 And check that we still have the same session
 
 ```bash
- version=khoolsession; for i in {1..5} ; do curl -b /tmp/cookies -c /tmp/cookies -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep -A1 "Session ID:"; done
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
-Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
-HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
+version=khoolsession; for i in {1..5} ; do curl -b /tmp/cookies -c /tmp/cookies -s http://${version}.khool-session.info/khoolsession/BasicServlet | grep -A1 "Session ID:"; done
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
+# Session ID: 3625FB20BCA4181613683F3737B6F4E7<br />
+# HostName: <b>khoolsession-78b49bd75-bdsq2</b><br />
 ```
 
 now lets looks to the details version
@@ -210,4 +210,3 @@ docker build -f src/main/k8s.manual/Dockerfile.manual . -t khool-session-manual:
 kubectl apply -f src/main/k8s.manual/
 ```
 
-We'll discusse fabric8 automation later ;-)
