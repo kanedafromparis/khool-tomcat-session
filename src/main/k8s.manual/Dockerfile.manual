@@ -3,7 +3,7 @@
 # mvn package && docker build -f src/main/k8s.manual/Dockerfile.manual . -t khool-session-manual:0.3
 # kubectl apply -f src/main/k8s.manual/
 #
-FROM tomcat:jdk11-openjdk-slim
+FROM tomcat:10.0.18-jdk11-openjdk-slim-bullseye
 RUN cp -r  /usr/local/tomcat/webapps.dist/examples/ /usr/local/tomcat/webapps/examples
 ADD src/main/conf/conf-tomcat-server.xml /usr/local/tomcat/conf/server.xml
 ADD src/main/conf/conf-context.xml /usr/local/tomcat/conf/context.xml
