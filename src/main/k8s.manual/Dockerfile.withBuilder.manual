@@ -14,7 +14,7 @@ RUN mvn -B -f /tmp/pom.xml -s /usr/share/maven/ref/settings-docker.xml package
 RUN ls -l /tmp/target
 
 
-FROM tomcat:jdk11-openjdk-slim
+FROM tomcat:10.0-jdk11-openjdk-slim-bullseye
 ARG REVISION=0.3-SNAPSHOT
 RUN cp -r  /usr/local/tomcat/webapps.dist/examples/ /usr/local/tomcat/webapps/examples
 COPY --from=builder /tmp/src/main/conf/conf-tomcat-server.xml /usr/local/tomcat/conf/server.xml
